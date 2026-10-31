@@ -11,6 +11,7 @@ Rules:
   - base headers: 节次 / 实验名称 / 实验地点
   - time: 日期, or 周次+星期; either group is enough, both allowed
   - per row: valid 周次+星期 wins, otherwise fall back to 日期
+  - optional 备注 column (exported last); old 6-column files are accepted
   - shared week1 comes from data/设置.json
 
 The default data is written into the inert <template id="defaultData"> JSON,
@@ -50,6 +51,7 @@ MAX_EXPERIMENTS = 5000
 MAX_PERIOD_LEN = 100
 MAX_NAME_LEN = 200
 MAX_PLACE_LEN = 200
+MAX_NOTE_LEN = 500
 
 SETTINGS_WEEK1 = None
 
@@ -136,6 +138,15 @@ def clean_field(value, label, max_len, required=False, default=""):
     return text or default
 
 
+def clean_note(value, label):
+    text = cell_text(value).replace("\r\n", "\n").replace("\r", "\n")
+    text = re.sub(r"[\u0000-\u0008\u000B\u000C\u000E-\u001F]", "", text)
+    text = text.strip()
+    if len(text) > MAX_NOTE_LEN:
+        fail("%s 超过 %d 个字符" % (label, MAX_NOTE_LEN))
+    return text
+
+
 def read_settings():
     if not SETTINGS.exists():
         fail("找不到 %s" % SETTINGS)
@@ -217,12 +228,14 @@ def read_class_file(path, class_id):
             period = clean_field(at("节次"), "%s 第 %d 行节次" % (path.name, row_number), MAX_PERIOD_LEN, True)
             name = clean_field(at("实验名称"), "%s 第 %d 行实验名称" % (path.name, row_number), MAX_NAME_LEN, True)
             place = clean_field(at("实验地点"), "%s 第 %d 行实验地点" % (path.name, row_number), MAX_PLACE_LEN, False, "待定")
+            note = clean_note(at("备注"), "%s 第 %d 行备注" % (path.name, row_number))
 
             experiments.append({
                 "date": d.isoformat(),
                 "period": period,
                 "name": name,
                 "place": place,
+                "note": note,
             })
             if len(experiments) > MAX_EXPERIMENTS:
                 fail("%s 的实验数量超过 %d" % (path.name, MAX_EXPERIMENTS))
