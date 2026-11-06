@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ruu8DKx9f+yDwBeBfRO0WPmHLSvcJiqFVo8cC+jXd5g='; script-src-elem 'sha256-ruu8DKx9f+yDwBeBfRO0WPmHLSvcJiqFVo8cC+jXd5g='; script-src-attr 'none'; style-src 'sha256-QYbtdSmyHCuAG6hG05+pcTCEcMk029ElO1XhKKFW6Lc='; style-src-elem 'sha256-QYbtdSmyHCuAG6hG05+pcTCEcMk029ElO1XhKKFW6Lc='; style-src-attr 'none'; img-src 'none'; font-src 'none'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'; trusted-types xlsx-xml">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GqMXyGD+xOkQdXdIkrkOiuHLeqeh69gDdSiCdUACQz4='; script-src-elem 'sha256-GqMXyGD+xOkQdXdIkrkOiuHLeqeh69gDdSiCdUACQz4='; script-src-attr 'none'; style-src 'sha256-cgm5WSbaQqMKCyukij3oP7YfuTu8baQ7cMyqa5XR00s='; style-src-elem 'sha256-cgm5WSbaQqMKCyukij3oP7YfuTu8baQ7cMyqa5XR00s='; style-src-attr 'none'; img-src 'none'; font-src 'none'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'; trusted-types xlsx-xml">
 <meta name="referrer" content="no-referrer">
 <title>实验课提醒</title>
 <style>
@@ -160,72 +160,51 @@
   /* ---------- 时间冲突：左侧整列浅琥珀色（无文字） ---------- */
   tbody tr.row-conflict td.cell-mark {
     background: #ffe6a6;
-    box-shadow: inset 3px 0 0 #b7791f;
   }
   tbody tr.row-conflict.row-past td.cell-mark {
     background: #f6e3b8;
-    box-shadow: inset 3px 0 0 #c49a45;
   }
-  tbody tr.conflict-peer td.cell-mark {
-    background: #ffd978;
-    box-shadow: inset 3px 0 0 #8a5306;
-  }
-  tbody tr.row-conflict.row-past.conflict-peer td.cell-mark {
-    background: #eddaa5;
-    box-shadow: inset 3px 0 0 #a17a2a;
-  }
-  tbody tr.row-conflict.conflict-join-next td.cell-mark {
-    position: relative;
-    border-bottom-color: #ffe6a6;
-  }
-  tbody tr.row-conflict.conflict-join-top td.cell-mark {
-    border-top-color: #ffe6a6;
-  }
-  tbody tr.row-past.row-conflict.conflict-join-next td.cell-mark {
-    border-bottom-color: #f6e3b8;
-  }
-  tbody tr.row-past.row-conflict.conflict-join-top td.cell-mark {
-    border-top-color: #f6e3b8;
-  }
-  tbody tr.row-conflict.conflict-join-next td.cell-mark::before,
-  tbody tr.row-conflict.conflict-join-next td.cell-mark::after {
-    content: ""; position: absolute; bottom: -1px; pointer-events: none;
-  }
-  tbody tr.row-conflict.conflict-join-next td.cell-mark::before {
-    left: 0; width: 3px; height: 1px; background: #b7791f;
-  }
-  tbody tr.row-conflict.conflict-join-next td.cell-mark::after {
-    left: 0; right: 0; height: 1px; background: #ffe6a6;
-  }
-  tbody tr.row-past.row-conflict.conflict-join-next td.cell-mark::before {
-    background: #c49a45;
-  }
-  tbody tr.row-past.row-conflict.conflict-join-next td.cell-mark::after {
-    background: #f6e3b8;
-  }
-  tbody tr.row-conflict.conflict-peer.conflict-join-next td.cell-mark::before {
-    background: #8a5306;
-  }
-  tbody tr.row-conflict.conflict-peer.conflict-join-next td.cell-mark::after {
-    background: #ffd978;
-  }
-  tbody tr.row-conflict.conflict-peer.conflict-join-next td.cell-mark {
-    border-bottom-color: #ffd978;
-  }
-  tbody tr.row-conflict.conflict-peer.conflict-join-top td.cell-mark {
-    border-top-color: #ffd978;
-  }
-  tbody tr.row-past.row-conflict.conflict-peer.conflict-join-next td.cell-mark::before {
-    background: #a17a2a;
-  }
-  tbody tr.row-past.row-conflict.conflict-peer.conflict-join-next td.cell-mark::after {
-    background: #eddaa5;
-  }
-  tbody tr.row-past.row-conflict.conflict-peer.conflict-join-next td.cell-mark {
-    border-bottom-color: #eddaa5;
-  }
-  tbody tr.row-past.row-conflict.conflict-peer.conflict-join-top td.cell-mark {
-    border-top-color: #eddaa5;
+  /* 以下边框和悬停只用于桌面表格；手机端由 tr 边框跨卡片连接。 */
+  @media (min-width: 941px) {
+    tbody tr.row-conflict td.cell-mark {
+      border-left: 3px solid #b7791f;
+      padding-left: 7px;
+    }
+    tbody tr.row-conflict.row-past td.cell-mark {
+      border-left-color: #c49a45;
+    }
+    tbody tr.conflict-peer td.cell-mark {
+      background: #ffd978;
+      border-left-color: #8a5306;
+    }
+    tbody tr.row-conflict.row-past.conflict-peer td.cell-mark {
+      background: #eddaa5;
+      border-left-color: #a17a2a;
+    }
+    tbody tr.row-conflict.conflict-join-next td.cell-mark {
+      border-bottom-color: #ffe6a6;
+    }
+    tbody tr.row-conflict.conflict-join-top td.cell-mark {
+      border-top-color: #ffe6a6;
+    }
+    tbody tr.row-past.row-conflict.conflict-join-next td.cell-mark {
+      border-bottom-color: #f6e3b8;
+    }
+    tbody tr.row-past.row-conflict.conflict-join-top td.cell-mark {
+      border-top-color: #f6e3b8;
+    }
+    tbody tr.row-conflict.conflict-peer.conflict-join-next td.cell-mark {
+      border-bottom-color: #ffd978;
+    }
+    tbody tr.row-conflict.conflict-peer.conflict-join-top td.cell-mark {
+      border-top-color: #ffd978;
+    }
+    tbody tr.row-past.row-conflict.conflict-peer.conflict-join-next td.cell-mark {
+      border-bottom-color: #eddaa5;
+    }
+    tbody tr.row-past.row-conflict.conflict-peer.conflict-join-top td.cell-mark {
+      border-top-color: #eddaa5;
+    }
   }
   tbody tr.note-row[data-conflict] td {
     border-left: 4px solid #c28a12;
@@ -1468,7 +1447,6 @@ function syncClassSelect() {
    ============================================================ */
 let deleteMode = false;        // 是否处于删除模式
 let editMode = false;          // 是否处于编辑模式
-let editChangedInMode = false; // 本次编辑模式内是否保存过修改
 let recentOnly = true;         // 是否仅显示本周及以后（每次打开默认勾选）
 let conflictOnly = false;      // 是否只看时间冲突（每次打开默认关闭）
 let filterBeforeMode = true;   // 进入编辑/删除模式前的筛选状态
@@ -2543,6 +2521,10 @@ conflictFilter.addEventListener('change', () => {
 const tableBodyEl = document.getElementById('tbody');
 let hoverConflictId = null;
 
+function conflictHoverEnabled() {
+  return window.matchMedia('(min-width: 941px)').matches;
+}
+
 function setConflictHover(id, on) {
   if (id == null || id === '') return;
   tableBodyEl.querySelectorAll(`tr[data-conflict="${id}"]`).forEach(tr => {
@@ -2551,6 +2533,11 @@ function setConflictHover(id, on) {
 }
 
 tableBodyEl.addEventListener('pointerover', (e) => {
+  if (!conflictHoverEnabled()) {
+    setConflictHover(hoverConflictId, false);
+    hoverConflictId = null;
+    return;
+  }
   if (e.pointerType && e.pointerType !== 'mouse') return;
   const target = e.target;
   if (!target || typeof target.closest !== 'function') return;
@@ -2562,6 +2549,11 @@ tableBodyEl.addEventListener('pointerover', (e) => {
   setConflictHover(id, true);
 });
 tableBodyEl.addEventListener('pointerleave', () => {
+  setConflictHover(hoverConflictId, false);
+  hoverConflictId = null;
+});
+window.addEventListener('resize', () => {
+  if (conflictHoverEnabled()) return;
   setConflictHover(hoverConflictId, false);
   hoverConflictId = null;
 });
@@ -2939,7 +2931,6 @@ modalSubmit.addEventListener('click', () => {
     }
 
     experiments[editIdx] = item;
-    editChangedInMode = true;
     lastEditedByClass.set(selectedClass, { index: editIdx, before });
     lastDeletedByClass.delete(selectedClass);
 
@@ -3110,7 +3101,6 @@ function enterDeleteMode() {
 function setEditModeUI(on) {
   editMode = on;
   if (on) {
-    editChangedInMode = false;
     beginModeFilter();
   } else {
     endModeFilter();
@@ -3146,12 +3136,8 @@ function enterEditMode() {
 
 function exitEditMode() {
   if (!editMode) return;
-  const changed = editChangedInMode;
   setEditModeUI(false);
   render();
-  if (!changed) {
-    showStatus('ok', '已退出编辑模式，未编辑任何实验');
-  }
 }
 
 function finishDeleteMode() {
@@ -3165,7 +3151,6 @@ function finishDeleteMode() {
 
   if (!picked.length) {
     render();
-    showStatus('ok', '已退出删除模式，未删除任何实验');
     return;
   }
 
