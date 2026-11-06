@@ -1,8 +1,10 @@
-git status --short
+git status
 pause
-git add -A
+git pull origin main
 pause
-git commit -m "feat: feat: 实验备注与 xlsx 备注列"
+git add .
 pause
-git push
+git commit -m "Update: fix known issues"
+pause
+git push origin main
 pause
