@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ixbPtoYkgK/SCx4jShj/PQBvI5SwTpZ3ng4OBVxNsJY='; script-src-elem 'sha256-ixbPtoYkgK/SCx4jShj/PQBvI5SwTpZ3ng4OBVxNsJY='; script-src-attr 'none'; style-src 'sha256-yGHRjmCns4Vr9OzgXoFxxtyLcuYUyvylFkv4SWepfis='; style-src-elem 'sha256-yGHRjmCns4Vr9OzgXoFxxtyLcuYUyvylFkv4SWepfis='; style-src-attr 'none'; img-src 'none'; font-src 'none'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'; trusted-types xlsx-xml">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ruu8DKx9f+yDwBeBfRO0WPmHLSvcJiqFVo8cC+jXd5g='; script-src-elem 'sha256-ruu8DKx9f+yDwBeBfRO0WPmHLSvcJiqFVo8cC+jXd5g='; script-src-attr 'none'; style-src 'sha256-QYbtdSmyHCuAG6hG05+pcTCEcMk029ElO1XhKKFW6Lc='; style-src-elem 'sha256-QYbtdSmyHCuAG6hG05+pcTCEcMk029ElO1XhKKFW6Lc='; style-src-attr 'none'; img-src 'none'; font-src 'none'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'; trusted-types xlsx-xml">
 <meta name="referrer" content="no-referrer">
 <title>实验课提醒</title>
 <style>
@@ -52,6 +52,8 @@
     width: 16px; height: 16px; margin: 0;
     accent-color: #0969da; cursor: pointer;
   }
+  .recent-filter.is-disabled { color: #8c959f; cursor: not-allowed; opacity: .6; }
+  .recent-filter.is-disabled input { cursor: not-allowed; }
   .recent-count { font-size: 12px; color: #8c959f; white-space: nowrap; }
   .import-btn {
     padding: 8px 16px; font-size: 14px; font-weight: 600; line-height: 1.4;
@@ -119,6 +121,7 @@
   .dot-today    { background: #ffd7d5; border: 1px solid #e5484d; }
   .dot-tomorrow { background: #d3f5d9; border: 1px solid #2da44e; }
   .dot-past     { background: #eaeef2; border: 1px solid #d0d7de; }
+  .dot-conflict { background: #ffe6a6; border: 1px solid #b7791f; }
 
   .table-wrap { overflow: visible; }
   table { width: 100%; min-width: 860px; border-collapse: collapse; font-size: 14px; }
@@ -153,6 +156,81 @@
     border-bottom-color: #c3f0cd;
   }
   .row-past td { color: #9aa4af; }
+
+  /* ---------- 时间冲突：左侧整列浅琥珀色（无文字） ---------- */
+  tbody tr.row-conflict td.cell-mark {
+    background: #ffe6a6;
+    box-shadow: inset 3px 0 0 #b7791f;
+  }
+  tbody tr.row-conflict.row-past td.cell-mark {
+    background: #f6e3b8;
+    box-shadow: inset 3px 0 0 #c49a45;
+  }
+  tbody tr.conflict-peer td.cell-mark {
+    background: #ffd978;
+    box-shadow: inset 3px 0 0 #8a5306;
+  }
+  tbody tr.row-conflict.row-past.conflict-peer td.cell-mark {
+    background: #eddaa5;
+    box-shadow: inset 3px 0 0 #a17a2a;
+  }
+  tbody tr.row-conflict.conflict-join-next td.cell-mark {
+    position: relative;
+    border-bottom-color: #ffe6a6;
+  }
+  tbody tr.row-conflict.conflict-join-top td.cell-mark {
+    border-top-color: #ffe6a6;
+  }
+  tbody tr.row-past.row-conflict.conflict-join-next td.cell-mark {
+    border-bottom-color: #f6e3b8;
+  }
+  tbody tr.row-past.row-conflict.conflict-join-top td.cell-mark {
+    border-top-color: #f6e3b8;
+  }
+  tbody tr.row-conflict.conflict-join-next td.cell-mark::before,
+  tbody tr.row-conflict.conflict-join-next td.cell-mark::after {
+    content: ""; position: absolute; bottom: -1px; pointer-events: none;
+  }
+  tbody tr.row-conflict.conflict-join-next td.cell-mark::before {
+    left: 0; width: 3px; height: 1px; background: #b7791f;
+  }
+  tbody tr.row-conflict.conflict-join-next td.cell-mark::after {
+    left: 0; right: 0; height: 1px; background: #ffe6a6;
+  }
+  tbody tr.row-past.row-conflict.conflict-join-next td.cell-mark::before {
+    background: #c49a45;
+  }
+  tbody tr.row-past.row-conflict.conflict-join-next td.cell-mark::after {
+    background: #f6e3b8;
+  }
+  tbody tr.row-conflict.conflict-peer.conflict-join-next td.cell-mark::before {
+    background: #8a5306;
+  }
+  tbody tr.row-conflict.conflict-peer.conflict-join-next td.cell-mark::after {
+    background: #ffd978;
+  }
+  tbody tr.row-conflict.conflict-peer.conflict-join-next td.cell-mark {
+    border-bottom-color: #ffd978;
+  }
+  tbody tr.row-conflict.conflict-peer.conflict-join-top td.cell-mark {
+    border-top-color: #ffd978;
+  }
+  tbody tr.row-past.row-conflict.conflict-peer.conflict-join-next td.cell-mark::before {
+    background: #a17a2a;
+  }
+  tbody tr.row-past.row-conflict.conflict-peer.conflict-join-next td.cell-mark::after {
+    background: #eddaa5;
+  }
+  tbody tr.row-past.row-conflict.conflict-peer.conflict-join-next td.cell-mark {
+    border-bottom-color: #eddaa5;
+  }
+  tbody tr.row-past.row-conflict.conflict-peer.conflict-join-top td.cell-mark {
+    border-top-color: #eddaa5;
+  }
+  tbody tr.note-row[data-conflict] td {
+    border-left: 4px solid #c28a12;
+    padding-left: 52px;
+  }
 
   /* ---------- 删除模式 ---------- */
   .delete-btn {
@@ -265,6 +343,14 @@
   .tag-today    { background: #e5484d; color: #fff; }
   .tag-tomorrow { background: #2da44e; color: #fff; }
   .tag-past     { background: #d8dee4; color: #6e7781; }
+
+  /* ---------- 表单/导入里的冲突提示 ---------- */
+  .form-conflict, .import-conflict {
+    margin: 0 0 14px; padding: 8px 10px;
+    border-left: 3px solid #c28a12; border-radius: 0 8px 8px 0;
+    background: #fffaf0; color: #7a4f01;
+    font-size: 12.5px; line-height: 1.65; word-break: break-word;
+  }
 
   /* ---------- 模态框 ---------- */
   .modal-mask {
@@ -499,6 +585,24 @@
     tbody tr.row-tomorrow td.cell-mobile { color: #1a7f37; font-weight: 700; }
     tbody tr.row-past td.cell-mobile { color: #6e7781; }
     tbody tr.row-past .m-name { color: #6e7781; }
+    tbody tr.row-conflict { border-left: 6px solid #c28a12; }
+    tbody tr.row-past.row-conflict { border-left-color: #c49a45; }
+    tbody tr.row-conflict td.cell-mark,
+    tbody tr.row-conflict.row-past td.cell-mark {
+      background: transparent; box-shadow: none;
+    }
+    tbody tr.row-conflict.conflict-join-next { border-bottom-left-radius: 0; }
+    tbody tr.row-conflict.conflict-join-top {
+      border-top-left-radius: 0; overflow: visible;
+    }
+    tbody tr.row-conflict.conflict-join-top::before {
+      content: ""; position: absolute; left: -6px; top: -14px;
+      width: 6px; height: 15px; background: #c28a12;
+      pointer-events: none; z-index: 1;
+    }
+    tbody tr.row-past.row-conflict.conflict-join-top::before {
+      background: #c49a45;
+    }
     .cell-mobile .m-line1 {
       display: flex; align-items: center; flex-wrap: wrap; gap: 2px 6px;
       font-size: 12.5px; color: #57606a; line-height: 1.6;
@@ -535,6 +639,10 @@
         <input type="checkbox" id="recentFilter" checked>
         <span>已结束仅显示本周</span>
       </label>
+      <label class="recent-filter" id="conflictFilterLabel" title="只显示参与时间冲突的实验">
+        <input type="checkbox" id="conflictFilter">
+        <span>只看冲突</span>
+      </label>
       <span class="recent-count" id="recentCount"></span>
     </div>
     <div class="head-actions">
@@ -559,9 +667,10 @@
   <div class="clock" id="clock">正在读取本机日期…</div>
 
   <div class="legend">
-    <span><i class="dot-today"></i>今天有实验（整行标红）</span>
-    <span><i class="dot-tomorrow"></i>明天有实验（整行标绿）</span>
+    <span><i class="dot-today"></i>今天</span>
+    <span><i class="dot-tomorrow"></i>明天</span>
     <span><i class="dot-past"></i>已结束</span>
+    <span id="conflictLegend" hidden><i class="dot-conflict"></i>时间冲突</span>
   </div>
 
   <div class="table-wrap">
@@ -634,6 +743,8 @@
         </datalist>
       </div>
 
+      <div class="form-conflict" id="formConflict" role="status" aria-live="polite" hidden></div>
+
       <div class="form-row">
         <label>实验名称 <span class="req">*</span></label>
         <input type="text" id="formName" maxlength="200" placeholder="例如 机械设计">
@@ -667,6 +778,7 @@
     </div>
     <div class="modal-body">
       <div class="import-summary" id="importSummary"></div>
+      <div class="import-conflict" id="importConflict" hidden></div>
 
       <div class="target-box" id="importTargetBox" hidden>
         <div class="target-title">导入目标</div>
@@ -986,6 +1098,180 @@ function parseWeekday(v) {
 
 
 /* ============================================================
+   2.1 时间冲突判定
+   ------------------------------------------------------------
+   规则：同一班级内，日期相同且节次范围有交集即算冲突；
+   实验名称、地点不参与判断。节次无法解析时按规整后的文本比较。
+   「第3-8节」与「第5-6节」算重叠。
+   ============================================================ */
+
+// 把「第3-4节」「3、4节」「第9-10节」解析成若干闭区间；无法解析返回 null。
+function parsePeriodRanges(value) {
+  const text = normKeyText(value)
+    .replace(/节/g, '')
+    .replace(/第/g, '')
+    .replace(/[~～至]/g, '-');
+  if (!text) return null;
+  const parts = text.split(/[、,，;；/]/).filter(Boolean);
+  if (!parts.length) return null;
+
+  const ranges = [];
+  for (const part of parts) {
+    const m = /^(\d+)(?:-(\d+))?$/.exec(part);
+    if (!m) return null;
+    let start = Number(m[1]);
+    let end = m[2] === undefined ? start : Number(m[2]);
+    if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end)) return null;
+    if (start > end) { const tmp = start; start = end; end = tmp; }
+    ranges.push([start, end]);
+  }
+  return ranges;
+}
+
+function periodRangesOverlap(a, b) {
+  for (const x of a) {
+    for (const y of b) {
+      if (Math.max(x[0], y[0]) <= Math.min(x[1], y[1])) return true;
+    }
+  }
+  return false;
+}
+
+// 返回 { groups, byIndex, totalRows }：
+// groups 按日期/节次排序，id 从 1 开始；byIndex 是「原 experiments 下标 -> 组」的映射。
+function computeConflictInfo(list) {
+  const rows = [];
+  (list || []).forEach((e, idx) => {
+    if (!e || !isValidDateStr(e.date)) return;
+    const ranges = parsePeriodRanges(e.period);
+    const key = ranges ? null : normKeyText(e.period);
+    if (!ranges && !key) return;
+    rows.push({
+      idx,
+      date: e.date,
+      ranges,
+      key,
+      period: String(e.period == null ? '' : e.period)
+    });
+  });
+
+  const parent = new Map();
+  rows.forEach(r => parent.set(r.idx, r.idx));
+
+  function find(x) {
+    let root = x;
+    while (parent.get(root) !== root) root = parent.get(root);
+    while (parent.get(x) !== x) {
+      const next = parent.get(x);
+      parent.set(x, root);
+      x = next;
+    }
+    return root;
+  }
+
+  function union(a, b) {
+    const ra = find(a);
+    const rb = find(b);
+    if (ra === rb) return;
+    // 固定让较小下标当根，结果稳定
+    if (ra < rb) parent.set(rb, ra);
+    else parent.set(ra, rb);
+  }
+
+  const byDate = new Map();
+  rows.forEach(r => {
+    if (!byDate.has(r.date)) byDate.set(r.date, []);
+    byDate.get(r.date).push(r);
+  });
+
+  byDate.forEach(bucket => {
+    const segments = [];
+    const unparsed = new Map();
+
+    bucket.forEach(r => {
+      if (!r.ranges) {
+        if (!unparsed.has(r.key)) unparsed.set(r.key, []);
+        unparsed.get(r.key).push(r.idx);
+        return;
+      }
+      r.ranges.forEach(range => {
+        segments.push({ idx: r.idx, start: range[0], end: range[1] });
+      });
+    });
+
+    // 无法解析的节次：只有规整后文本完全相同才算重叠。
+    unparsed.forEach(indices => {
+      for (let i = 1; i < indices.length; i++) union(indices[0], indices[i]);
+    });
+
+    // 区间扫描；同一行的多个区间通过共享 idx 自然连成一组。
+    segments.sort((a, b) => (a.start - b.start) || (a.end - b.end) || (a.idx - b.idx));
+    const active = [];
+    for (const seg of segments) {
+      const next = [];
+      for (const prev of active) {
+        if (prev.end >= seg.start) {
+          next.push(prev);
+          union(prev.idx, seg.idx);
+        }
+      }
+      next.push(seg);
+      active.length = 0;
+      active.push(...next);
+    }
+  });
+
+  const components = new Map();
+  rows.forEach(r => {
+    const root = find(r.idx);
+    if (!components.has(root)) components.set(root, []);
+    components.get(root).push(r);
+  });
+
+  const groups = [];
+  components.forEach(items => {
+    if (items.length < 2) return;
+    const date = items[0].date;
+    const periods = [];
+    let start = null;
+    items.forEach(it => {
+      if (!periods.includes(it.period)) periods.push(it.period);
+      if (it.ranges) {
+        it.ranges.forEach(range => {
+          if (start === null || range[0] < start) start = range[0];
+        });
+      }
+    });
+    groups.push({
+      date,
+      periods,
+      start: start === null ? 0 : start,
+      indices: items.map(it => it.idx).sort((a, b) => a - b)
+    });
+  });
+
+  groups.sort((a, b) =>
+    (a.date < b.date ? -1 : a.date > b.date ? 1 : 0) ||
+    (a.start - b.start) ||
+    (a.indices[0] - b.indices[0])
+  );
+
+  const byIndex = new Map();
+  let totalRows = 0;
+  groups.forEach((g, i) => {
+    g.id = i + 1;
+    g.size = g.indices.length;
+    g.dateLabel = g.date.slice(5);
+    g.periodLabel = g.periods.length <= 2 ? g.periods.join(' / ') : g.periods[0] + ' 等';
+    totalRows += g.size;
+    g.indices.forEach(idx => byIndex.set(idx, g));
+  });
+
+  return { groups, byIndex, totalRows };
+}
+
+
+/* ============================================================
    3. 第 1 周星期一
    ============================================================ */
 function readStoredDate(key) {
@@ -1184,8 +1470,11 @@ let deleteMode = false;        // 是否处于删除模式
 let editMode = false;          // 是否处于编辑模式
 let editChangedInMode = false; // 本次编辑模式内是否保存过修改
 let recentOnly = true;         // 是否仅显示本周及以后（每次打开默认勾选）
+let conflictOnly = false;      // 是否只看时间冲突（每次打开默认关闭）
 let filterBeforeMode = true;   // 进入编辑/删除模式前的筛选状态
+let conflictBeforeMode = false;
 let filterStateSaved = false;  // 是否已保存模式前的筛选状态
+let conflictFilterStateSaved = false;
 const markedIndices = new Set(); // 删除模式下，已标记待删除的实验下标
 
 function updateRecentCount(visible, total) {
@@ -1198,13 +1487,19 @@ function render() {
   const tbody = document.getElementById('tbody');
   const frag = document.createDocumentFragment();
 
+  const conflictInfo = computeConflictInfo(experiments);
+  if (!conflictInfo.groups.length && conflictOnly) {
+    conflictOnly = false;
+    conflictFilter.checked = false;
+  }
+
   const allRows = experiments
     .map((e, i) => ({ ...e, _date: parseDate(e.date), _idx: i }))
     .sort((a, b) => (a._date - b._date) || (a._idx - b._idx));
   const weekStart = startOfWeekMonday(today);
-  const rows = recentOnly
-    ? allRows.filter(e => e._date >= weekStart)
-    : allRows;
+  const rows = allRows
+    .filter(e => !recentOnly || e._date >= weekStart)
+    .filter(e => !conflictOnly || conflictInfo.byIndex.has(e._idx));
 
   updateRecentCount(rows.length, allRows.length);
 
@@ -1219,6 +1514,7 @@ function render() {
     tr.appendChild(td);
     frag.appendChild(tr);
     tbody.replaceChildren(frag);
+    syncConflictFilter(conflictInfo);
     return;
   }
 
@@ -1228,16 +1524,26 @@ function render() {
     tr.className = 'empty-row';
     const td = document.createElement('td');
     td.colSpan = 7;
-    td.appendChild(document.createTextNode(`本周一及以后没有实验；已隐藏 ${hidden} 条更早记录。`));
+    const noConflict = conflictOnly;
+    td.appendChild(document.createTextNode(
+      noConflict
+        ? `当前筛选下没有时间冲突；已隐藏 ${hidden} 条实验。`
+        : `本周一及以后没有实验；已隐藏 ${hidden} 条更早记录。`
+    ));
     td.appendChild(document.createElement('br'));
-    td.appendChild(document.createTextNode('取消勾选「已结束仅显示本周」可查看全部'));
+    td.appendChild(document.createTextNode(
+      noConflict
+        ? '取消「只看冲突」可查看全部实验；取消「已结束仅显示本周」可查看更早记录'
+        : '取消勾选「已结束仅显示本周」可查看全部'
+    ));
     tr.appendChild(td);
     frag.appendChild(tr);
     tbody.replaceChildren(frag);
+    syncConflictFilter(conflictInfo);
     return;
   }
 
-  rows.forEach(e => {
+  rows.forEach((e, rowPos) => {
     const diff = dayDiff(e._date, today);
     const tr = document.createElement('tr');
 
@@ -1258,6 +1564,16 @@ function render() {
 
     const marked = deleteMode && markedIndices.has(e._idx);
     if (marked) tr.classList.add('row-marked');
+
+    const conflict = conflictInfo.byIndex.get(e._idx);
+    if (conflict) {
+      tr.classList.add('row-conflict');
+      tr.dataset.conflict = String(conflict.id);
+      const prevGroup = rowPos > 0 ? conflictInfo.byIndex.get(rows[rowPos - 1]._idx) : null;
+      const nextGroup = rowPos + 1 < rows.length ? conflictInfo.byIndex.get(rows[rowPos + 1]._idx) : null;
+      if (prevGroup && prevGroup.id === conflict.id) tr.classList.add('conflict-join-top');
+      if (nextGroup && nextGroup.id === conflict.id) tr.classList.add('conflict-join-next');
+    }
 
     const markTd = document.createElement('td');
     markTd.className = 'cell-mark';
@@ -1359,6 +1675,7 @@ function render() {
     if (e.note) {
       const noteTr = document.createElement('tr');
       noteTr.className = 'note-row';
+      if (conflict) noteTr.dataset.conflict = String(conflict.id);
       const noteTd = document.createElement('td');
       noteTd.colSpan = 7;
       noteTd.textContent = `备注：${e.note}`;
@@ -1368,6 +1685,7 @@ function render() {
   });
 
   tbody.replaceChildren(frag);
+  syncConflictFilter(conflictInfo);
 }
 
 
@@ -1526,7 +1844,7 @@ function zipStore(files) {
 }
 
 /* ---------- 生成 xlsx ---------- */
-function buildXlsxBlob(aoa, sheetName, colWidths) {
+function buildXlsxBlob(aoa, sheetName, colWidths, highlightRows) {
   const width = aoa.reduce((m, row) => Math.max(m, row.length), 0);
   const colsXml = (colWidths || []).slice(0, width).map((w, i) =>
     `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`
@@ -1534,11 +1852,12 @@ function buildXlsxBlob(aoa, sheetName, colWidths) {
 
   const rowsXml = aoa.map((row, r) => {
     let cells = '';
+    const style = highlightRows && highlightRows.has(r) ? ' s="1"' : '';
     for (let c = 0; c < width; c++) {
       const raw = row[c] == null ? '' : row[c];
       const text = String(raw);
       const preserve = /^\s|\s$/.test(text) ? ' xml:space="preserve"' : '';
-      cells += `<c r="${colName(c)}${r + 1}" t="inlineStr"><is><t${preserve}>${xmlEscape(text)}</t></is></c>`;
+      cells += `<c r="${colName(c)}${r + 1}" t="inlineStr"${style}><is><t${preserve}>${xmlEscape(text)}</t></is></c>`;
     }
     return `<row r="${r + 1}">${cells}</row>`;
   }).join('');
@@ -1565,10 +1884,10 @@ function buildXlsxBlob(aoa, sheetName, colWidths) {
   const stylesXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
     `<styleSheet xmlns="${XML_NS_MAIN}">` +
       '<fonts count="1"><font><sz val="11"/><name val="Calibri"/><family val="2"/></font></fonts>' +
-      '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>' +
+      '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFFF1C2"/><bgColor indexed="64"/></patternFill></fill></fills>' +
       '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
       '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
-      '<cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>' +
+      '<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="0" fillId="2" borderId="0" xfId="0" applyFill="1"/></cellXfs>' +
       '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
     '</styleSheet>';
 
@@ -2187,6 +2506,68 @@ function showStatus(type, msg, action) {
 
 
 /* ============================================================
+   8.1 时间冲突：顶部筛选 & 桌面悬停
+   ============================================================ */
+const conflictFilter = document.getElementById('conflictFilter');
+const conflictFilterLabel = document.getElementById('conflictFilterLabel');
+const conflictLegend = document.getElementById('conflictLegend');
+
+function syncConflictFilter(info) {
+  const totalGroups = info.groups.length;
+  conflictLegend.hidden = totalGroups === 0;
+
+  if (!totalGroups) {
+    conflictFilter.checked = false;
+    conflictOnly = false;
+    conflictFilter.disabled = true;
+    conflictFilter.title = '当前班没有时间冲突';
+    conflictFilterLabel.title = '当前班没有时间冲突';
+    conflictFilterLabel.classList.add('is-disabled');
+    return;
+  }
+
+  conflictFilter.disabled = false;
+  conflictFilter.checked = conflictOnly;
+  conflictFilter.title = '只显示参与时间冲突的实验';
+  conflictFilterLabel.title = '只显示参与时间冲突的实验';
+  conflictFilterLabel.classList.remove('is-disabled');
+}
+
+conflictFilter.addEventListener('change', () => {
+  if (conflictFilter.disabled) return;
+  conflictOnly = conflictFilter.checked;
+  render();
+});
+
+// 桌面端：鼠标移到任一同组冲突行时，同组行的左侧色块一起加深。
+const tableBodyEl = document.getElementById('tbody');
+let hoverConflictId = null;
+
+function setConflictHover(id, on) {
+  if (id == null || id === '') return;
+  tableBodyEl.querySelectorAll(`tr[data-conflict="${id}"]`).forEach(tr => {
+    tr.classList.toggle('conflict-peer', on);
+  });
+}
+
+tableBodyEl.addEventListener('pointerover', (e) => {
+  if (e.pointerType && e.pointerType !== 'mouse') return;
+  const target = e.target;
+  if (!target || typeof target.closest !== 'function') return;
+  const tr = target.closest('tr[data-conflict]');
+  const id = tr ? tr.dataset.conflict : null;
+  if (id === hoverConflictId) return;
+  setConflictHover(hoverConflictId, false);
+  hoverConflictId = id;
+  setConflictHover(id, true);
+});
+tableBodyEl.addEventListener('pointerleave', () => {
+  setConflictHover(hoverConflictId, false);
+  hoverConflictId = null;
+});
+
+
+/* ============================================================
    9. 顶部时间
    ============================================================ */
 function updateClock() {
@@ -2272,6 +2653,7 @@ const formName    = document.getElementById('formName');
 const formPlace   = document.getElementById('formPlace');
 const formNote    = document.getElementById('formNote');
 const formError   = document.getElementById('formError');
+const formConflict = document.getElementById('formConflict');
 
 function currentDateMode() {
   const el = document.querySelector('input[name="dateMode"]:checked');
@@ -2314,31 +2696,85 @@ function syncDateModeUI() {
   formWeekday.disabled = dateActive;
 }
 
+function getFormConflictMatches() {
+  let dateStr = '';
+  if (currentDateMode() === 'date') {
+    const v = formDate.value;
+    if (isValidDateStr(v)) dateStr = v;
+  } else {
+    const w = parseInt(formWeek.value, 10);
+    const wd = parseInt(formWeekday.value, 10);
+    if (Number.isInteger(w) && w >= 1 && w <= MAX_WEEK && Number.isInteger(wd) && wd >= 1 && wd <= 7) {
+      dateStr = toDateStr(dateFromWeekWeekday(w, wd));
+    }
+  }
+  if (!dateStr) return [];
+
+  const ranges = parsePeriodRanges(formPeriod.value);
+  const key = ranges ? null : normKeyText(formPeriod.value);
+  if (!ranges && !key) return [];
+
+  const out = [];
+  experiments.forEach((e, i) => {
+    if (i === editingIndex) return;
+    if (e.date !== dateStr) return;
+    const other = parsePeriodRanges(e.period);
+    let hit = false;
+    if (ranges && other) hit = periodRangesOverlap(ranges, other);
+    else if (!ranges && !other) hit = key === normKeyText(e.period);
+    if (hit) out.push(e);
+  });
+  return out;
+}
+
+function updateFormConflictHint() {
+  const matches = getFormConflictMatches();
+  if (!matches.length) {
+    formConflict.hidden = true;
+    formConflict.textContent = '';
+    return;
+  }
+
+  const brief = matches.slice(0, 2)
+    .map(e => `${e.period} ${e.name}（${e.place}）`)
+    .join('；');
+  const more = matches.length > 2 ? `等 ${matches.length} 条` : '';
+  formConflict.textContent =
+    `时间冲突：与已有 ${matches.length} 条实验重叠 —— ${brief}${more}。仍可保存。`;
+  formConflict.hidden = false;
+}
+
 document.querySelectorAll('input[name="dateMode"]').forEach(el => {
   el.addEventListener('change', () => {
     syncDateModeUI();
     if (currentDateMode() === 'date') updateWeekFromDate();
     else updateDateFromWeek();
     showFormError('');
+    updateFormConflictHint();
   });
 });
 
 formWeek.addEventListener('input', () => {
   if (currentDateMode() !== 'week') return;
   updateDateFromWeek();
+  updateFormConflictHint();
 });
 formWeekday.addEventListener('change', () => {
   if (currentDateMode() !== 'week') return;
   updateDateFromWeek();
+  updateFormConflictHint();
 });
 formDate.addEventListener('input', () => {
   if (currentDateMode() !== 'date') return;
   updateWeekFromDate();
+  updateFormConflictHint();
 });
 formDate.addEventListener('change', () => {
   if (currentDateMode() !== 'date') return;
   updateWeekFromDate();
+  updateFormConflictHint();
 });
+formPeriod.addEventListener('input', updateFormConflictHint);
 
 function showFormError(msg) {
   if (!msg) {
@@ -2367,6 +2803,7 @@ function resetForm() {
   formNote.value = '';
   syncDateModeUI();
   showFormError('');
+  updateFormConflictHint();
 }
 
 function openModal() {
@@ -2410,6 +2847,7 @@ function openEditModal(idx) {
   formNote.value = item.note || '';
   syncDateModeUI();
   showFormError('');
+  updateFormConflictHint();
 
   modalMask.classList.add('show');
   setTimeout(() => {
@@ -2422,6 +2860,8 @@ function closeModal() {
   editingIndex = null;
   modalTitle.textContent = '添加实验';
   modalSubmit.textContent = '确认添加';
+  formConflict.hidden = true;
+  formConflict.textContent = '';
 }
 
 addBtn.addEventListener('click', openModal);
@@ -2595,17 +3035,30 @@ function beginModeFilter() {
     filterBeforeMode = recentFilter.checked;
     filterStateSaved = true;
   }
+  if (!conflictFilterStateSaved) {
+    conflictBeforeMode = conflictOnly;
+    conflictFilterStateSaved = true;
+  }
   recentOnly = false;
   recentFilter.checked = false;
   recentFilter.disabled = false;
+  conflictOnly = false;
+  conflictFilter.checked = false;
 }
 
 function endModeFilter() {
-  if (!filterStateSaved) return;
-  filterStateSaved = false;
-  recentFilter.disabled = false;
-  recentFilter.checked = filterBeforeMode;
-  recentOnly = filterBeforeMode;
+  if (!filterStateSaved && !conflictFilterStateSaved) return;
+  if (filterStateSaved) {
+    filterStateSaved = false;
+    recentFilter.disabled = false;
+    recentFilter.checked = filterBeforeMode;
+    recentOnly = filterBeforeMode;
+  }
+  if (conflictFilterStateSaved) {
+    conflictFilterStateSaved = false;
+    conflictOnly = conflictBeforeMode;
+    conflictFilter.checked = conflictOnly;
+  }
 }
 
 function syncHeaderActions() {
@@ -2848,6 +3301,7 @@ const importClose      = document.getElementById('importClose');
 const importCancelBtn  = document.getElementById('importCancel');
 const importConfirmBtn = document.getElementById('importConfirm');
 const importSummary    = document.getElementById('importSummary');
+const importConflict   = document.getElementById('importConflict');
 const mergeDesc        = document.getElementById('mergeDesc');
 const replaceDesc      = document.getElementById('replaceDesc');
 const importNote       = document.getElementById('importNote');
@@ -2937,6 +3391,23 @@ function renderImportSummary() {
     note.textContent = '新建班只在本机保留；导出该班 xlsx 放进 data/ 并 build 后才会成为部署默认。';
     importSummary.appendChild(note);
   }
+}
+
+function renderImportConflictHint(list) {
+  const info = computeConflictInfo(list);
+  if (!info.groups.length) {
+    importConflict.hidden = true;
+    importConflict.textContent = '';
+    return;
+  }
+
+  const brief = info.groups.slice(0, 2)
+    .map(g => `${g.dateLabel} ${g.periodLabel}（${g.size} 条）`)
+    .join('、');
+  const more = info.groups.length > 2 ? '等' : '';
+  importConflict.textContent =
+    `时间冲突：导入后该班将有 ${info.groups.length} 组冲突（${info.totalRows} 条实验）：${brief}${more}。仍可继续导入。`;
+  importConflict.hidden = false;
 }
 
 function syncImportTargetUI() {
@@ -3030,6 +3501,9 @@ function renderImportPreview() {
     updatePlace: conflictSelect.value === 'update'
   });
 
+  const resultList = selectedImportMode() === 'replace' ? pendingImport.list : preview.list;
+  renderImportConflictHint(resultList);
+
   const parts = [`保留 ${targetId} 现有 ${targetData.length} 条`];
   if (preview.added.length) parts.push(`新增 ${preview.added.length} 条`);
   else parts.push('没有可新增的记录');
@@ -3096,6 +3570,8 @@ function openImportModal(data) {
 function closeImportModal() {
   importMask.classList.remove('show');
   pendingImport = null;
+  importConflict.hidden = true;
+  importConflict.textContent = '';
 }
 
 importClose.addEventListener('click', closeImportModal);
@@ -3240,15 +3716,24 @@ function exportXlsx() {
       ]);
     });
 
-    const blob = buildXlsxBlob(aoa, EXPORT_SHEET_NAME, EXPORT_COL_WIDTHS);
+    const conflictInfo = computeConflictInfo(experiments);
+    const highlight = new Set();
+    rows.forEach((e, i) => {
+      if (conflictInfo.byIndex.has(e._idx)) highlight.add(i + 1);
+    });
+
+    const blob = buildXlsxBlob(aoa, EXPORT_SHEET_NAME, EXPORT_COL_WIDTHS, highlight);
     const fileName = `${selectedClass}.xlsx`;
     downloadBlob(blob, fileName);
 
+    const base = rows.length
+      ? `已导出班级 ${selectedClass} 的 ${rows.length} 条实验安排：${fileName}`
+      : `已导出班级 ${selectedClass} 的空表（仅表头）：${fileName}`;
     showStatus(
       'ok',
-      rows.length
-        ? `已导出班级 ${selectedClass} 的 ${rows.length} 条实验安排：${fileName}`
-        : `已导出班级 ${selectedClass} 的空表（仅表头）：${fileName}`
+      base + (highlight.size
+        ? `；其中 ${conflictInfo.groups.length} 组时间冲突所在行已标为浅黄色`
+        : '')
     );
   } catch (err) {
     showStatus('error', '导出失败：' + (err && err.message ? err.message : String(err)));
